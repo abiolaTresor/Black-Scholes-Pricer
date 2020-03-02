@@ -7,12 +7,8 @@ Le sujet "projet_2_black_scholes.pdf" et le rapport "rapport_du_projet.pdf" perm
 
 Un bref aperçu du sujet :
 
-$$
-\frac{\partial C}{\partial t}+r S \frac{\partial C}{\partial S}+\frac{1}{2} \sigma^{2} S^{2} \frac{\partial^{2} C}{\partial S^{2}}=r C \quad \text { sur }[0, T] \times[0, L]
-$$
+$\frac{\partial C}{\partial t}+r S \frac{\partial C}{\partial S}+\frac{1}{2} \sigma^{2} S^{2} \frac{\partial^{2} C}{\partial S^{2}}=r C \quad \text { sur }[0, T] \times[0, L]$
 
-$$
-\frac{\partial \tilde{C}}{\partial \tilde{t}}=\mu \frac{\partial^{2} \tilde{C}}{\partial \tilde{s}^{2}}
-$$
+$\frac{\partial \tilde{C}}{\partial \tilde{t}}=\mu \frac{\partial^{2} \tilde{C}}{\partial \tilde{s}^{2}}$
 
 Ecrire un programme C++ qui résoud (1) et (5) de manière structurée, sans l’aide de bibliothèque extérieure. On utilisera une classe abstraite pour gérer les deux payoff considérés ci-dessus.
