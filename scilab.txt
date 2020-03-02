@@ -1,0 +1,43 @@
+Mccall = read("crankCall.csv", 1001, 2)
+Xccall = Mccall(1:1001)
+Yccall = Mccall(1002:2002)
+plot(Xccall, Yccall, ".r")
+
+Mfdmcall = read("fdmCall.csv", 1001, 2)
+Xfdmcall = Mfdmcall(1:1001)
+Yfdmcall = Mfdmcall(1002:2002)
+plot(Xfdmcall, Yfdmcall, "LineWidth", 5)
+
+title("Calcul des Calls avec la méthode des différences finies et de Crank Nicholson")
+legends(["CN_Call", "FDM_Call"], [2,5],opt="lr")
+
+
+Merrorcall = read("errorsCall.csv", 90, 2)
+Xerrorcall = Merrorcall(1:90)
+Yerrorcall = Merrorcall(91:180)
+plot(Xerrorcall, Yerrorcall,"LineWidth", 5)
+title("Erreur du Call entre C(0,s) et ~(0,s) ")
+
+
+
+
+Mcput = read("crankPut.csv", 1001, 2)
+Xcput = Mcput(1:1001)
+Ycput = Mcput(1002:2002)
+plot(Xcput, Ycput,"LineWidth", 5)
+
+Mfdmput = read("fdmPut.csv", 1001, 2)
+Xfdmput = Mfdmput(1:1001)
+Yfdmput = Mfdmput(1002:2002)
+plot(Xfdmput, Yfdmput, ".r")
+legends(["CN_Put", "FDM_Put"], [2,5],opt="lr")
+title("Calcul des Puts avec la méthode des différences finies et de Crank Nicholson")
+
+Merrorput = read("errorsPut.csv", 90, 2)
+Xerrorput = Merrorput(1:90)
+Yerrorput = Merrorput(91:180)
+plot(Xerrorput, Yerrorput,"LineWidth", 5)
+title("Erreur du Put entre C(0,s) et ~(0,s) ")
+
+
+

@@ -1,0 +1,549 @@
+\documentclass[12pt]{report}
+\usepackage[a4paper]{geometry}
+\usepackage[myheadings]{fullpage}
+\usepackage{fancyhdr}
+\usepackage{lastpage}
+\usepackage{graphicx, wrapfig, subcaption, setspace, booktabs}
+\usepackage[T1]{fontenc}
+\usepackage[font=small, labelfont=bf]{caption}
+\usepackage{fourier}
+\usepackage[protrusion=true, expansion=true]{microtype}
+% \usepackage[english]{babel}
+\usepackage{sectsty}
+\usepackage{url, lipsum}
+\usepackage{tgbonum}
+\usepackage{hyperref}
+\usepackage{xcolor}
+\usepackage{listings}
+\usepackage{color}
+
+
+\usepackage[french]{babel}
+\usepackage[utf8]{inputenc}  
+  
+ 
+\definecolor{codegreen}{rgb}{0,0.6,0}
+\definecolor{codegray}{rgb}{0.5,0.5,0.5}
+\definecolor{codepurple}{rgb}{0.58,0,0.82}
+\definecolor{backcolour}{rgb}{0.95,0.95,0.92}
+ 
+\lstdefinestyle{mystyle}{
+    backgroundcolor=\color{backcolour},   
+    commentstyle=\color{codegreen},
+    keywordstyle=\color{magenta},
+    numberstyle=\tiny\color{codegray},
+    stringstyle=\color{codepurple},
+    basicstyle=\footnotesize,
+    breakatwhitespace=false,         
+    breaklines=true,                 
+    captionpos=b,                    
+    keepspaces=true,                 
+    numbers=left,                    
+    numbersep=5pt,                  
+    showspaces=false,                
+    showstringspaces=false,
+    showtabs=false,                  
+    tabsize=2
+}
+ 
+\lstset{style=mystyle}
+
+\newcommand{\HRule}[1]{\rule{\linewidth}{#1}}
+\onehalfspacing
+\setcounter{tocdepth}{5}
+\setcounter{secnumdepth}{5}
+
+
+
+%-------------------------------------------------------------------------------
+% HEADER & FOOTER
+
+%-------------------------------------------------------------------------------
+%\pagestyle{fancy}
+%\fancyhf{}
+%\setlength\headheight{15pt}
+%\fancyhead[L]{Student ID: 1034511}
+%\fancyhead[R]{Anglia Ruskin University}
+%\fancyfoot[R]{Page \thepage\ of \pageref{LastPage}}
+%-------------------------------------------------------------------------------
+% TITLE PAGE
+%-------------------------------------------------------------------------------
+
+\begin{document}
+{\fontfamily{cmr}\selectfont
+\title{ \normalsize \textsc{}
+		\\ [2.0cm]
+		\HRule{0.5pt} \\
+		\LARGE \textbf{\uppercase{Rapport de PAP} \\
+		\large{Black Scholes}
+		\HRule{0.5pt} \\ [0.5cm]
+		\normalsize \today \vspace*{5\baselineskip}}
+		}
+
+\date{}
+
+\author{
+		Abiola Trésor Djigui \\ 
+		Guillaume Shi de Milleville\\}
+
+\maketitle
+\tableofcontents
+\newpage
+
+%-------------------------------------------------------------------------------
+% Section title formatting
+\sectionfont{\scshape}
+%-------------------------------------------------------------------------------
+
+%-------------------------------------------------------------------------------
+% BODY
+%-------------------------------------------------------------------------------
+\section{Sujet}
+
+Le sujet consiste à résoudre 
+
+$$
+\frac{\partial C}{\partial t}+r S \frac{\partial C}{\partial S}+\frac{1}{2} \sigma^{2} S^{2} \frac{\partial^{2} C}{\partial S^{2}}=r C 
+$$
+
+$$
+\frac{\partial \tilde{C}}{\partial \tilde{t}}=\mu \frac{\partial^{2} \tilde{C}}{\partial \tilde{s}^{2}}
+$$
+avec un temps terminal T donné, r le taux d'intérêt du marché et $\sigma$ la volatilité de l'actif. La fonction $C(s,t)$ est définie sur $[0, T] \times[0, L]$
+
+\noindent Ceci afin de calculer $C(0,s)$ pour tout $s \in [0,L] C(0,s)$ avec les deux méthodes ci-dessus.
+
+
+
+\section{Théorie Mathématique}
+
+\subsection{Différences finies}
+
+La résolution d'équations différencielles via les méthodes de différences finies consiste à discrétiser les espaces de variables en intervalles réguliers. Le problème de résolution revient donc à déterminer la fonction en chacun des points de la grille issue de la discrétisation.
+
+Dans un second temps, on approxime les dérivées partielles dans l'équation par des différences. Ces approximations définissent le type de méthode de différence finie adopté pour la résolution. 
+
+\noindent Pour la résolution de l'EDP de Black-Scholes, nous utiliserons la méthode de Crank-Nicholson et la méthode des differences finies implicite.
+
+\subsection{Crank Nicholson}
+
+\noindent Pour résoudre l'équation différentielle avec la méthode Crank Nicholson :
+$$
+\frac{\partial C}{\partial t}+r S \frac{\partial C}{\partial S}+\frac{1}{2} \sigma^{2} S^{2} \frac{\partial^{2} C}{\partial S^{2}}=r C 
+$$
+
+On adopte les approximations suivantes:
+
+$$
+\frac{\partial C_{i-1/2,j}}{\partial t} = \frac{C_{i,j}-C_{i-1,j}}{\delta t}
+$$
+
+$$
+\frac{\partial C_{i-1/2,j}}{\partial S} = \frac{1}{2}[\frac{f_{i-1,j+1}-f_{i-1,j-1}}{2\delta S}+\frac{f_{i,j+1}-f_{i,j-1}}{2\delta S}]
+$$
+
+$$
+\frac{\partial^{2}C_{i-1/2,j}}{\partial S^2} = \frac{1}{2}[\frac{C_{i-1,j+1}-2C_{i-1,j}+C_{i-1,j-1}}{\partial S^2}+\frac{C_{i,j+1}-2C_{i,j}+C_{i,j-1}}{\partial S^2}]
+$$
+
+\noindent où i et j représentent les indices sur la grille. En injectant ces approximations dans l'équation différentielle obtient:
+
+$$
+-a_jC_{i-1,j-1}+(1-b_j)C_{i-1,j}-c_jC_{i-1,j+1} = a_jC_{i,j-1}+(1+b_j)C_{i,j}+c_jC_{i,j+1}
+$$
+avec
+$$
+a_j = \frac{\delta t}{4}(\sigma^2j^2-rj)
+$$
+$$
+b_j = -\frac{\delta t}{2}(\sigma^2j^2+r)
+$$
+$$
+c_j = \frac{\delta t}{4}(\sigma^2j^2+rj)
+$$
+
+\noindent Cette équation revient en réalité à résoudre un système de M-1 équations à M-1 variables pour chaque i=N-1,\dots,1. 
+
+\noindent On passe donc à la forme matricielle suivante:
+
+$$
+CF_{i-1}=DF_{i}+K_{i-1}+K_{i} \forall i \in (N,1)
+$$
+où
+$$
+F_i = \left[\begin{array}{cccc}{F_{i,1}}\\{F_{i,2}}\\{\vdots}\\{F_{i,M-1}}\end{array}\right]
+$$
+
+$$
+K_i = \left[\begin{array}{cccc}{a_1 C_{i,0}}\\{0}\\{\vdots}\\{0}\\{c_{M-1} C_{i,M}}\end{array}\right]
+$$
+$$
+C=\left[\begin{array}{cccccc}{1-b_1}&{-c_1}&{0}&{\cdots}&{0}&{0}\\{-a_2}&{1-b_2}&{-c_2}&{\cdots}&{0}&{0}\\{0}&{-a_3}&{1-b_3}&{\cdots}&{0}&{0}\\{\vdots}&{\vdots}&{\vdots}&{\ddots}&{\vdots}&{\vdots}\\{0}&{0}&{0}&{\cdots}&{-a_{M-1}}&{1-b_{M-1}}\end{array}\right]
+$$
+
+$$
+D=\left[\begin{array}{cccccc}{1+b_1}&{c_1}&{0}&{\cdots}&{0}&{0}\\{a_2}&{1+b_2}&{c_2}&{\cdots}&{0}&{0}\\{0}&{a_3}&{1+b_3}&{\cdots}&{0}&{0}\\{\vdots}&{\vdots}&{\vdots}&{\ddots}&{\vdots}&{\vdots}\\{0}&{0}&{0}&{\cdots}&{a_{M-1}}&{1+b_{M-1}}\end{array}\right]
+$$
+
+\noindent On initialise le système (calcul de $F_n$) à l'aide des conditions initiales puis par récurrence, on détermine Fi pour $i=N-1, ..., 0$.
+
+
+
+
+\subsection{Via la méthode des différences finies implicite}
+
+\subsubsection{Changements de variables}
+\noindent En faisant les changements de variables suivants
+
+$$
+t=T-\frac{\tau}{\frac{1}{2}\sigma^2}
+$$
+et
+
+$$
+S=K e^x
+$$
+on peut écrire $C(t,S)=Kv(\tau,x)$ avec $v$ vérifiant
+$$
+\frac{\partial v}{\partial \tau}=\frac{\partial^2v}{\partial x^2}+(k-1)\frac{\partial v}{\partial x}-kv
+$$
+où $$k=\frac{r}{\sigma^2/2}$$
+
+\noindent Ensuite, on pose $v=exp(\alpha x + \beta \tau)\tilde{C}(\tau,x)$ où $\alpha$ et $\beta$ sont à choisir avec un souci de simplification de l'équation à résoudre.
+En substituant $v$ par sa nouvelle expression dans l'équation, on obtient:
+
+$$
+\alpha = -\frac{k-1}{2}
+$$
+$$
+\beta = -\frac{(k+1)^2}{4}
+$$
+$$
+\frac{\partial \tilde{C}}{\partial \tau}=\frac{\partial^2 \tilde{C}}{\partial x^2}
+$$
+
+\noindent Les nouveaux espaces des variables sont: $-\infty <x< log(L/K)$ et $0\le \tau \le \frac{\sigma^2 T}{2}$
+
+\noindent Il nous faut donc résoudre cette équation avec les conditions:
+$$
+\tilde{C}(\tau,-\infty)  \hspace*{2cm} \forall 0\le \tau \le \frac{\sigma^2 T}{2}
+$$
+$$
+\tilde{C}(\tau,log(L/K)  \hspace*{2cm} \forall 0\le \tau \le \frac{\sigma^2 T}{2}
+$$
+$$
+\tilde{C}(0,x)  \hspace*{2cm} \forall -\infty <x< log(L/K)
+$$
+que nous déterminons facilement via la relation liant $C$ et $\tilde{C}$.
+
+\subsubsection{Résolution}
+
+Le but est de résoudre l'équation réduite précédente via la méthode des différences finies implicite puis de repasser aux valeurs de C via la relation
+$$
+C(S,t)=K e^{\alpha x + \beta \tau}\tilde{C}(x,\tau)
+$$
+
+Pour la discrétisation de l'espace de $x$, on devra fixer une borne inférieure. En effet, il est impossible de discrétiser de manière finie l'intervalle infini [$-\infty , log(L/K)$]. On prend $X^-$ pour borne inférieure et l'espace des $x$ devient en conséquence [$X^-,log(L/K)$].
+Pour plus de simplicité, on pose $u=\tilde{C}$ pour la suite.
+
+\noindent On adopte les approximations suivantes:
+$$
+\frac{\partial u_{i,j}}{\partial \tau} = \frac{u_{i,j}-u_{i-1,j}}{\delta \tau}
+$$
+
+$$
+\frac{\partial u_{i,j}}{\partial x^2} =\frac{u_{i+1,j-1}-2u_{i+1,j}+u_{i+1,j+1}}{\delta x^2}
+$$
+
+\noindent En injectant ces approximations dans l'équation de départ puis en posant $\gamma=\frac{\delta \tau}{\delta x^2}$, on obtient:
+$$
+-\gamma u_{i+1,j-1} + (1+2\gamma)u_{i+1,j} - \gamma u_{i+1,j+1} = u_{i,j}
+$$
+
+\noindent ce qui donne sous forme matricielle
+$$
+CU_{i+1} =U_i + K_{i+1} 
+$$
+où
+$$
+C = \left[\begin{array}{cccccc}{1+2\gamma}&{-\gamma}&{0}&{\cdots}&{0}&{0}\\{-\gamma}&{1+2\gamma}&{-\gamma}&{\cdots}&{0}&{0}\\{0}&{-\gamma}&{1+2\gamma}&{\cdots}&{0}&{0}\\{\vdots}&{\vdots}&{\vdots}&{\ddots}&{\vdots}&{\vdots}\\{0}&{0}&{0}&{\cdots}&{-\gamma}&{1+2\gamma}\end{array}\right]
+$$
+
+$$
+U_i = \left[\begin{array}{cccc}{u_{i,x^-}}\\{\vdots}\\{u_{i,0}}\\{\vdots}\\{u_{i,x^+ -1}}\end{array}\right]
+$$
+
+$$
+K_i=\left[\begin{array}{cccc}{\gamma u_{i,x^-}}\\{0}\\{\vdots}\\{0}\\{\gamma u_{i,x^+ }}\end{array}\right]
+$$
+
+On initialise le système avec les conditions initiales précisées plus haut puis par récurrence, on détermine les valeurs de $u=\tilde{C}$ en chaque point de la grille de discrétisation. Enfin, on déduit de cette résolution de l'équation réduite, les valeurs de C(t,S).
+
+% \input{roadmap.tex}
+%\newpage
+%\section{Getting Started}
+%\input{getstart.tex}
+
+
+\section{Implémentation en C++: problèmes, solutions et structures}
+% \input{projupdate.tex}
+
+\subsection{Problèmes rencontrés et solutions adoptées}
+
+\subsubsection{Problème de complexité}
+
+\noindent Pour la résolution du problème de l'EDP de Black-Scholes, nous constatons qu'il y a des systèmes matriciels à résoudre. Celà nous pousse à utiliser des matrices carrées avec des opérations de multiplications et d'additions matricielles. 
+
+\noindent Deux problèmes se posent ici:
+\begin{itemize}
+    \item la complexité spatiale de la représentation en mémoire des matrices de tailles importantes.
+    \item la complexité temporelle de création de ces matrices ainsi que des opérations sur les matrices.
+\end{itemize}
+
+En effet, pour une discrétisation spatiale en M intervalles, on a une complexité en $O(M^2)$ pour la création ou le stockage et une compexité en $O(M^3)$ pour les opérations de produits.
+
+$$
+A B=\left(\begin{array}{cccc}{\sum_{k=1}^{n} a_{1, k} b_{k, 1}} & {\sum_{k=1}^{n} a_{1, k} b_{k, 2}} & {\cdots} & {\sum_{k=1}^{n} a_{1, k} b_{k, p}} \\ {\sum_{k=1}^{n} a_{2, k} b_{k, 1}} & {\sum_{k=1}^{n} a_{2, k} b_{k, 2}} & {\cdots} & {\sum_{k=1}^{n} a_{2, k} b_{k, p}} \\ {\vdots} & {\vdots} & {\ddots} & {\vdots} \\ {\sum_{k=1}^{n} a_{m, k} b_{k, 1}} & {\sum_{k=1}^{n} a_{m, k} b_{k, 2}} & {\cdots} & {\sum_{k=1}^{n} a_{m, k} b_{k, p}}\end{array}\right)
+$$
+
+\noindent Heureusement, nous pouvons contourner ce problème de complexité puisque les matrices aux nous sommes confrontées sont tridiagonale. Nous allons donc adapter le code de manière à ne stocker en mémoire que les coefficients non nuls, i.e ceux sur les diagonales inférieure, principale et supérieure. Aussi, l'opération \textit{produit matriciel} est adapté de manière à ne s'intéresser qu'aux coefficients non nuls des matrices. 
+
+Cette solution permet de diminuer significativement la complexité de notre algorithme. En effet, nous passons de complexités quadratique et cubique à une complexité linéaire: création, stockage et produit en $O(M)$.
+
+
+\subsubsection{Problème de discrétisation}
+L'espace des $x$ pour la résolution de l'équation différentielle est [$-\infty,H$], pour H>0. Il n'est pas possible de discrétiser un tel intervalle. Lors de l'implémentation, on a donc dû fixer une borne inférieure dans l'espace transformé (espace des $x$). En fonction de cette borne inf, le passage dans l'espace initial (espace avant transformation) donne lieu à des prix plus ou moins concentrés vers 0 (ou vers $L$). La borne inf dans l'espace transformé a donc dû être choisie judicieusement pour avoir des valeurs de $C$ bien étalées après transformation inverse.
+
+
+\subsubsection{Problème de complexité}
+Lors du calcul des erreurs, on a rencontré une difficulté: les prix sous-jacents pour les quels on connait le prix de l'option ne coincident pas pour les deux méthodes. Ceci est dû au fait que lors de la transformation inverse des abscisses pour passer aux prix réels, perd l'écart régulier créé lors de la discrétisation à l'échelle logarithmique. Alors si on fait la différences des prix en balayant simplement le tableau [prix sous jacent, prix option], on a pas vraiment les bonnes correspondances et donc l'évaluation d'erreur serait fausse. 
+
+Alors, pour résoudre ce problème, on va certes balayer le tableau [prix sous jacent, prix option] mais on ne calculera l'erreur associé que si la différence entre les prix (abscisses) des deux méthodes est inférieure à une constante $\epsilon$ choisie. Pour notre implémentation, on a choisi  $\epsilon=4$.
+
+\newpage
+
+\subsection{Description des classes}
+
+\noindent Nous avons dû créer différentes classes afin de factoriser le mieux possible le code. Les différentes classes que nous avons utilisé sont les suivantes:
+\begin{itemize}
+ \item  \textbf{Payoff}: représente la fonctionnalité du payoff.
+    \item \textbf{PayoffCall}: hérite de \textbf{Payoff} et représente le payoff d'un Call.
+    \item \textbf{PayoffPut}: hérite de \textbf{Payoff} et représente les payoff d'un Put.
+    
+    (Figure \textbf{\ref{payoff}})
+    
+    
+    \item  \textbf{EurOption}: composé d'un \textbf{Payoff} et représente une option de type européene.
+    
+    (Figure \textbf{\ref{EurOption}})
+    
+    
+    \item \textbf{BlackScholesPDE}: représente l'équation de black-scholes complète associée à une \textbf{EurOption}.
+    
+    (Figure \textbf{\ref{BS}})
+    
+
+    
+    \item \textbf{ReducedPDE}: représente l'équation réduite assocé à une \textbf{EurOption}.
+    
+    (Figure \textbf{\ref{EqR}})
+    
+    \item \textbf{CrankNicholson}: représente la résolution par la méthode de crank-Nicholson d'une \textbf{BlackScholesPDE}.
+    
+    (Figure \textbf{\ref{CN}})
+    
+    
+    
+    \item \textbf{FdmImplicite} : représente la résolution par la méthode des différences finies d'une \textbf{ReducedPDE}.
+    
+    (Figure \textbf{\ref{Fdm}})
+    
+    
+    \item \textbf{Error}: qui permet de gérer les erreus.
+    
+    
+    
+    \item \textbf{BaseMatrix}: classe abstraite représentant une colonne.
+    \item \textbf{ColMatrix}: hérite de \textbf{BaseMatrix} et représente les matrices colonnes.
+    \item  \textbf{TridiagoMatrix}: hérite de \textbf{BaseMatrix} et représente les matrices tridiagonales.
+    
+    (Figure \textbf{\ref{mat}})
+    
+    
+    
+    \item \textbf{TidiagoLinearSolver}: représente la résolution d'un système linéire tridiagonal.
+   
+   (Figure \textbf{\ref{tri}})
+   
+   
+   
+\end{itemize}{}
+
+% \input{results.tex}
+
+%-------------------------------------------------------------------------------
+% REFERENCES
+%-------------------------------------------------------------------------------
+\newpage
+\section{Conclusion}
+
+Pour conclure, la principal problème rencontré dans ce projet est celui de la complexité. Au début, nous avons eu beaucoup de mal à faire fonctionner notre programme en temps restreint en raison des tailles de discrétisations imposées pour l'application numérique. Mais très vite, ce problème a été contourné en définissant une classe qui gère de manière intelligente les matrices de grandes tailles.
+
+Les courbes obtenues par les deux méthodes sont très proches, aussi bien dans le cas du $\textit{Call}$ que celui du $\textit{Put}$. Nous observons une allure reconnaissable pour les $\textit{Put}$. Contrairement à ce à quoi on s'attendait, nous n'observons pas de parité $\textit{Call-Put}$. Mais celà est certainement dû à la condition de bord à droite pour le $\textit{Call}$, qui elle même ne satisfait pas la parité $\textit{C-P}$ avec la condition de bord à droite pour le $\textit{Put}$.
+
+\noindent Les graphes suivants représentent ceux que nous avons obtenus à l'issus de ce projet.
+
+\begin{figure}[!h]
+	\centering
+	\includegraphics[width=0.7\textwidth]{calls2.png}
+	\caption{Prix du Call pour les deux méthodes en fonction du prix sous jacent}
+	\centering
+	\label{label:file_name}
+\end{figure}
+
+
+
+
+\begin{figure}
+    \centering
+	\includegraphics[width=0.7\textwidth]{puts2.png}
+	\caption{Prix du Put pour les deux méthodes en fonction du prix sous jacent}
+	\centering
+\end{figure}
+
+
+\begin{figure}
+    \centering
+	\includegraphics[width=0.5\textwidth]{erreurPut.png}
+	    \centering
+\end{figure} 
+
+\begin{figure}
+    \centering
+	\includegraphics[width=0.5\textwidth]{erreurCall.png}
+	    \centering
+	\caption{Erreur Put et call}
+\end{figure}
+
+
+\newpage
+\section{Annexe}
+
+    \begin{figure}[!h]
+	\centering
+	\includegraphics[width=1\textwidth]{payoff2.png}
+	\caption{Payoff}
+	\centering
+	\label{payoff}
+    \end{figure}
+    
+        \begin{figure}[!h]
+	\centering
+	\includegraphics[width=0.8\textwidth]{EurOption.png}
+	\caption{Option Européenne}
+	\centering
+	\label{EurOption}
+\end{figure}
+    
+    
+        \begin{figure}[!h]
+	\centering
+	\includegraphics[width=0.6\textwidth]{blackscholesPDE.png}
+	\caption{Equation de Black Scholes}
+	\centering
+	\label{BS}
+\end{figure}
+
+    \begin{figure}[!h]
+	\centering
+	\includegraphics[width=0.5\textwidth]{ReducedPDE.png}
+	\caption{Equation Réduite}
+	\centering
+	\label{EqR}
+\end{figure}
+
+\begin{figure}[!h]
+	\centering
+	\includegraphics[width=0.5\textwidth]{CrankNicholson.png}
+	\caption{Crank Nicholson}
+	\centering
+	\label{CN}
+\end{figure}
+
+\begin{figure}[!h]
+	\centering
+	\includegraphics[width=0.9\textwidth]{Fdmimplicite.png}
+	\caption{Méthode des différences finies implicite}
+	\centering
+	\label{Fdm}
+\end{figure}
+
+
+\begin{figure}[!h]
+	\centering
+	\includegraphics[width=1\textwidth]{matrices2.png}
+	\caption{Matrices}
+	\centering
+	\label{mat}
+\end{figure}
+
+\begin{figure}[!h]
+	\centering
+	\includegraphics[width=0.4\textwidth]{TridiagoLinearSolver.png}
+	\caption{Solveur pour matrices sytèmes linéaires tridiagonaux}
+	\centering
+	\label{tri}
+\end{figure}
+% Malgré une précision de (?) le projet atteint des limites pour (?). Il peut encore être améliorer en (--> temps de calcul ? autre méthode non utilisée ici ? utilisation de librairie annexe ?) 
+}
+\end{document}
+
+%-------------------------------------------------------------------------------
+% SNIPPETS
+%-------------------------------------------------------------------------------
+
+%\begin{figure}[!ht]
+%	\centering
+%	\includegraphics[width=0.8\textwidth]{file_name}
+%	\caption{}
+%	\centering
+%	\label{label:file_name}
+%\end{figure}
+
+%\begin{table}[!ht]\footnotesize
+%	\centering
+%	\begin{tabular}{cccccc}
+%	\toprule
+%	\multicolumn{2}{c} {Pearson's correlation test} & \multicolumn{4}{c} {Independent t-test} \\
+%	\midrule	
+%	\multicolumn{2}{c} {Gender} & \multicolumn{2}{c} {Activity level} & \multicolumn{2}{c} {Gender} \\
+%	\midrule
+%	Males & Females & 1st level & 6th level & Males & Females \\
+%	\midrule
+%	\multicolumn{2}{c} {BMI vs. SP} & \multicolumn{2}{c} {Systolic pressure} & \multicolumn{2}{c} {Systolic Pressure} \\
+%	\multicolumn{2}{c} {BMI vs. DP} & \multicolumn{2}{c} {Diastolic pressure} & \multicolumn{2}{c} {Diastolic pressure} \\
+%	\multicolumn{2}{c} {BMI vs. MAP} & \multicolumn{2}{c} {MAP} & \multicolumn{2}{c} {MAP} \\
+%	\multicolumn{2}{c} {W:H ratio vs. SP} & \multicolumn{2}{c} {BMI} & \multicolumn{2}{c} {BMI} \\
+%	\multicolumn{2}{c} {W:H ratio vs. DP} & \multicolumn{2}{c} {W:H ratio} & \multicolumn{2}{c} {W:H ratio} \\
+%	\multicolumn{2}{c} {W:H ratio vs. MAP} & \multicolumn{2}{c} {\% Body fat} & \multicolumn{2}{c} {\% Body fat} \\
+%	\multicolumn{2}{c} {} & \multicolumn{2}{c} {Height} & \multicolumn{2}{c} {Height} \\
+%	\multicolumn{2}{c} {} & \multicolumn{2}{c} {Weight} & \multicolumn{2}{c} {Weight} \\
+%	\multicolumn{2}{c} {} & \multicolumn{2}{c} {Heart rate} & \multicolumn{2}{c} {Heart rate} \\
+%	\bottomrule
+%	\end{tabular}
+%	\caption{Parameters that were analysed and related statistical test performed for current study. BMI - body mass index; SP - systolic pressure; DP - diastolic pressure; MAP - mean arterial pressure; W:H ratio - waist to hip ratio.}
+%	\label{label:tests}
+%\end{table}%\documentclass{article}
+%\usepackage[utf8]{inputenc}
+
+%\title{Weekly Report template}
+%\author{gandhalijuvekar }
+%\date{January 2019}
+
+%\begin{document}
+
+%\maketitle
+
+%\section{Introduction}
+
+%\end{document}
